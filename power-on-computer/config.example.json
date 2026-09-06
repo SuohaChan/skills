@@ -1,0 +1,7 @@
+{
+  "endpoint": "http://apis.bemfa.com/va/sendMessage",
+  "uid": "replace-with-your-bemfa-uid",
+  "topic": "computerPower",
+  "type": "1",
+  "message": "on"
+}
