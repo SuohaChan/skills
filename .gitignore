@@ -1,0 +1,16 @@
+# Runtime output
+screenshots/
+desktop-screenshot/screenshots/
+power-on-computer/config.json
+
+# Local evaluation and temporary artifacts
+*-workspace/
+evals/*/outputs/
+*.tmp
+*.log
+
+# Secrets and machine-local configuration
+.env
+.env.*
+!.env.example
+**/secrets/
