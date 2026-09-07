@@ -1,0 +1,26 @@
+[
+  {
+    "episode": 1,
+    "title": "日文原名",
+    "title_cn": null,
+    "romaji": "Romaji Title",
+    "time": "23:00 GMT+8",
+    "cover": "https://s4.anilist.co/file/anilistcdn/media/anime/cover/large/example.jpg",
+    "source": "anilist",
+    "schedule_kind": "episode",
+    "source_id": 1,
+    "site_url": "https://anilist.co/anime/1"
+  },
+  {
+    "source_id": 1,
+    "title": "原名示例",
+    "title_cn": "中文名示例",
+    "romaji": null,
+    "episode": null,
+    "time": null,
+    "cover": null,
+    "site_url": "https://bgm.tv/subject/1",
+    "source": "bangumi",
+    "schedule_kind": "weekly"
+  }
+]
