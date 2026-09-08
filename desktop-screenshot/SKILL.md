@@ -25,7 +25,7 @@ description: 截取当前桌面/屏幕画面并保存为 PNG 图片到指定目�
   - 脚本会输出 "Screens: ..." 一行的每屏坐标信息，便于排查。
   - DPI 感知通过 `SetProcessDPIAware()` 声明，保证坐标是物理像素，避免高缩放（如 175%）下截图偏移。
 
-- 默认保存目录：`D:\project\skill\screenshots`。可通过 `-OutputDir` 参数覆盖（幂等，会自动创建子目录）。
+- 默认保存目录：技能目录下的 `screenshots/`。可通过 `-OutputDir` 参数覆盖（幂等，会自动创建子目录）。
 - 文件名用时间戳命名，天然不会重名，每次调用生成一张新图。
 - 输出图像为 PNG 格式。
 

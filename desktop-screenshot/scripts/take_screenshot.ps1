@@ -1,6 +1,11 @@
 ﻿param(
-    [string]$OutputDir = "D:\project\skill\screenshots"
+    [string]$OutputDir
 )
+
+if ([string]::IsNullOrWhiteSpace($OutputDir)) {
+    $skillRoot = Split-Path $PSScriptRoot -Parent
+    $OutputDir = Join-Path $skillRoot 'screenshots'
+}
 
 Add-Type -AssemblyName System.Drawing
 

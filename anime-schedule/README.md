@@ -5,7 +5,7 @@ Claude Code skill — 查询每日新番播出表，中日双语名 + 封面图 
 ## 安装
 
 ```bash
-git clone https://github.com/SuohaChan/anime-schedule.git ~/.claude/skills/anime-schedule
+git clone https://github.com/SuohaChan/anime-schedule.git <skills-directory>/anime-schedule
 ```
 
 ## 依赖
@@ -67,7 +67,7 @@ skill 会自动：
 
 `--json` 的 stdout 是 JSON 数组；诊断信息写入 stderr，方便下游解析。
 
-`make-grid.py` 会根据自身位置定位字体、缓存和默认输出目录，不依赖固定的 AstrBot 路径。它先把每部番剧渲染成独立 Card，再按行列合成大图；默认 `--rows 4 --cols 2`，也可切换为 `--rows 2 --cols 4`、`--rows 3 --cols 3`。服务器上可用 `--output-dir /AstrBot/data/temp` 指定 AstrBot 图片目录，也可用 `--cache-dir` 指定封面缓存目录。
+`make-grid.py` 会根据自身位置定位字体、缓存和默认输出目录，不依赖宿主应用或固定绝对路径。它先把每部番剧渲染成独立 Card，再按行列合成大图；默认 `--rows 4 --cols 2`，也可切换为 `--rows 2 --cols 4`、`--rows 3 --cols 3`。需要交给宿主应用发送时，用 `--output-dir <宿主图片目录>` 指定图片目录，也可用 `--cache-dir` 指定封面缓存目录。
 
 ## 抓取模块
 

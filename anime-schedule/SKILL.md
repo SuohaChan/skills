@@ -8,7 +8,7 @@ description: Query weekly anime episode release schedules. Use when user asks ab
 ## 1. 拉取数据
 
 ```bash
-cd /AstrBot/data/skills/anime-schedule && python3 scripts/fetch_anime.py today --json
+cd <skill-directory> && python3 scripts/fetch_anime.py today --json
 ```
 参数：`today` / `tomorrow` / `yesterday` / `DD.MM.YYYY`；数据源配置在 `sources.json`，脚本按 `priority` 逐条尝试。默认 `--source auto`，也可用 `--source anilist`、`--source jikan`、`--source tsuzuki` 或 `--source bangumi` 指定数据源。Tsuzuki 提供按日期的集数和播出时间；Bangumi 提供番剧列表和星期信息，缺少集数或精确播出时间时统一输出 JSON `null`。
 
@@ -44,9 +44,9 @@ echo '<JSON>' | python3 scripts/merge-episodes.py > merged.json
 ## 5. 生成拼图
 
 ```bash
-cd /AstrBot/data/skills/anime-schedule && echo '<JSON>' | python3 scripts/make-grid.py --rows 4 --cols 2 --output-dir /AstrBot/data/temp
+cd <skill-directory> && echo '<JSON>' | python3 scripts/make-grid.py --rows 4 --cols 2 --output-dir <output-directory>
 ```
-默认布局是 4 行 2 列，每页最多 8 部；可用 `--rows 2 --cols 4` 或 `--rows 3 --cols 3` 切换布局。每部番剧先渲染为独立 Card，再由布局器合成大图。默认图片输出到技能目录的 `output/`；上面的 `--output-dir` 示例将图片放到 AstrBot 临时目录。封面缓存默认在技能目录的 `cover_cache/`，也可用 `--cache-dir` 覆盖。
+默认布局是 4 行 2 列，每页最多 8 部；可用 `--rows 2 --cols 4` 或 `--rows 3 --cols 3` 切换布局。每部番剧先渲染为独立 Card，再由布局器合成大图。默认图片输出到技能目录的 `output/`；需要交给宿主应用发送时，用 `--output-dir` 指定宿主的图片目录。封面缓存默认在技能目录的 `cover_cache/`，也可用 `--cache-dir` 覆盖。
 
 ## 6. 发送
 
