@@ -1,0 +1,7 @@
+# These are personal runtime data, not source code
+references/title-cache.json
+data/
+cover_cache/
+output/
+references/blacklist.json
+scripts/__pycache__/

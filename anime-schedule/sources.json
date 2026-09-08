@@ -1,0 +1,9 @@
+{
+  "trust_env": false,
+  "sources": [
+    {"name": "tsuzuki", "enabled": true, "priority": 10, "url": "https://tsuzuki.top/api/v1/schedule", "timeout": 20},
+    {"name": "anilist", "enabled": true, "priority": 20, "url": "https://graphql.anilist.co", "timeout": 20},
+    {"name": "jikan", "enabled": true, "priority": 30, "url": "https://api.jikan.moe/v4/schedules", "timeout": 20},
+    {"name": "bangumi", "enabled": true, "priority": 40, "url": "https://api.bgm.tv/calendar", "timeout": 20}
+  ]
+}

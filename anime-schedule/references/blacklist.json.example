@@ -1,0 +1,5 @@
+{
+  "_note": "Anime blacklist. Copy to blacklist.json. Titles here are hidden from daily schedule. Key = AniList native title.",
+  "entries": {
+  }
+}
