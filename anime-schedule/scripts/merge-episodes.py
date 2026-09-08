@@ -24,11 +24,14 @@ def merge(data):
             groups[key]["episode"] = values[0]
             continue
         try:
-            numbers = [int(value) for value in values]
+            numbers = sorted({int(value) for value in values})
         except ValueError:
             groups[key]["episode"] = "~".join(values)
         else:
-            groups[key]["episode"] = f"{min(numbers)}~{max(numbers)}"
+            if numbers[-1] - numbers[0] + 1 == len(numbers):
+                groups[key]["episode"] = f"{numbers[0]}~{numbers[-1]}"
+            else:
+                groups[key]["episode"] = ",".join(str(number) for number in numbers)
     return [groups[k] for k in order]
 
 def main():

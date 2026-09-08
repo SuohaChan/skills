@@ -1,6 +1,6 @@
 ---
 name: anime-schedule
-description: Query weekly anime episode release schedules. Use when user asks about anime airing times, new episodes, what's airing today/tomorrow, uses "新番", "动漫更新", "今天有什么番", "明天播什么", "这季新番", "anime schedule", "新番导视", "今日新番", "今日番剧", "追番清单".
+description: Query anime episode release schedules and generate a card-grid image when useful. Use this skill whenever the user asks about anime airing times, new episodes, what's airing today/tomorrow, today's anime, a new-anime guide, an anime schedule, or an anime schedule poster, including "新番", "动漫更新", "今天有什么番", "明天播什么", "这季新番", "anime schedule", "新番导视", "今日新番", "今日番剧", "追番清单".
 ---
 
 # Anime Schedule

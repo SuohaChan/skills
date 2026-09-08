@@ -28,11 +28,17 @@ class MergeEpisodesTests(unittest.TestCase):
     def test_duplicate_and_out_of_order_episodes_use_numeric_range(self):
         data = [
             {"title": "乱序番", "episode": 23},
+            {"title": "乱序番", "episode": 22},
             {"title": "乱序番", "episode": 21},
             {"title": "乱序番", "episode": 23},
         ]
 
         self.assertEqual(merge_episodes.merge(data)[0]["episode"], "21~23")
+
+    def test_non_contiguous_episodes_are_not_reported_as_range(self):
+        data = [{"title": "跳集番", "episode": 1}, {"title": "跳集番", "episode": 3}]
+
+        self.assertEqual(merge_episodes.merge(data)[0]["episode"], "1,3")
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 {
-  "_note": "Anime blacklist. Copy to blacklist.json. Titles here are hidden from daily schedule. Key = AniList native title.",
+  "_note": "Anime blacklist. Copy to blacklist.json. Titles here are hidden from the daily schedule. Entries should match the source-returned original title.",
   "entries": {
   }
 }

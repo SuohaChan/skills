@@ -1,11 +1,12 @@
 # anime-schedule
 
-Claude Code skill — 查询每日新番播出表，中日双语名 + 封面图 + 黑名单过滤。
+Claude Code skill — 查询每日新番播出表，原名 + 中文译名 + 封面图 + 黑名单过滤。
 
 ## 安装
 
 ```bash
-git clone https://github.com/SuohaChan/anime-schedule.git <skills-directory>/anime-schedule
+git clone https://github.com/SuohaChan/skills.git <skills-directory>/skills
+# 技能目录为：<skills-directory>/skills/anime-schedule
 ```
 
 ## 依赖
@@ -22,9 +23,9 @@ git clone https://github.com/SuohaChan/anime-schedule.git <skills-directory>/ani
 
 skill 会自动：
 1. 按配置顺序尝试数据源，取得播出记录或周放送参考
-2. 日文原名 → 中文译名（查缓存 + 联网搜索）
+2. 数据源原名 → 中文译名（查缓存 + 联网搜索）
 3. 过滤黑名单
-4. 展示结果（中文名 / 日文名 / 封面图 / 播出时间）
+4. 展示结果（中文译名 / 原名 / 封面图 / 播出时间）
 
 ## 黑名单
 

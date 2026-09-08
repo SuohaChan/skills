@@ -1,6 +1,7 @@
 ---
 name: desktop-screenshot
-description: 截取当前桌面/屏幕画面并保存为 PNG 图片到指定目录。当用户想查看当前电脑桌面状态、截屏、截图、查看当前屏幕显示内容、查看现在电脑在干嘛、想把当前画面发给别人或保存下来时使用。即使没有明确说"截图"，只要是想让我"看看现在桌面上是什么""拍一张屏幕""屏幕现在长什么样"也应该使用本技能。
+description: 截取 Windows 当前桌面或所有显示器画面并保存为 PNG 图片。当用户想查看当前电脑桌面状态、截图、查看电脑现在在做什么、把当前画面发给别人或保存下来时使用；即使没有明确说“截图”，只要用户想让我看看当前屏幕，也使用本技能。
+compatibility: Requires Windows PowerShell and .NET desktop screen-capture APIs.
 ---
 
 # Desktop Screenshot
