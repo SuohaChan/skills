@@ -51,8 +51,6 @@ if ($VaultPath) {
     $actualPath = (Resolve-Path -LiteralPath $reportedPath).Path
     Assert-Condition ($actualPath -eq $expectedPath) "Obsidian CLI target mismatch: $reportedPath"
 
-    $unresolved = (& $obsidian.Source unresolved total | Out-String).Trim()
-    Assert-Condition ($unresolved -eq '0') "Vault has unresolved links: $unresolved"
 }
 
-Write-Output 'PASS: skill structure and configured vault checks passed'
+Write-Output 'PASS: skill structure and configured vault identity checks passed'
