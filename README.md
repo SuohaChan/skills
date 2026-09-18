@@ -9,6 +9,7 @@
 | [anime-schedule](./anime-schedule/) | 查询今日或指定日期的新番播出信息，并按卡片布局生成拼图 | Python 3.9+、`requests`、Pillow |
 | [desktop-screenshot](./desktop-screenshot/) | 截取当前桌面或所有显示器并保存为 PNG | Windows PowerShell、.NET |
 | [power-on-computer](./power-on-computer/) | 通过 Bemfa 向已配置的 ESP8266 发送一次开机指令 | Windows PowerShell、Bemfa 配置 |
+| [obsidian-cli-knowledge-base](./obsidian-cli-knowledge-base/) | 使用官方 Obsidian CLI 管理知识库，并遵循目标 vault 自己的规范 | Obsidian Desktop、官方 CLI |
 
 ## 安装
 
@@ -40,11 +41,14 @@ skills/
 ├── desktop-screenshot/
 │   ├── SKILL.md
 │   └── scripts/
-└── power-on-computer/
+├── power-on-computer/
+│   ├── SKILL.md
+│   ├── config.example.json
+│   ├── scripts/
+│   └── tests/
+└── obsidian-cli-knowledge-base/
     ├── SKILL.md
-    ├── config.example.json
-    ├── scripts/
-    └── tests/
+    └── agents/openai.yaml
 ```
 
 技能运行产生的缓存、截图、输出图片和本机配置不应提交到仓库。各技能的 `.gitignore` 已排除这些内容；真实的 Bemfa UID 只能放在本地 `power-on-computer/config.json` 中。
