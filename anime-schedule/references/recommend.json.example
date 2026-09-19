@@ -1,0 +1,5 @@
+{
+  "_note": "Copy to data/recommend.json. Matching original, Chinese, or romaji titles get a prominent recommendation banner on the card.",
+  "entries": {
+  }
+}

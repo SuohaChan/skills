@@ -18,11 +18,19 @@ PAGE_WIDTH = 920
 MIN_CARD_H = 200
 COVER_RATIO = 0.30
 
+# 推荐番剧的视觉标识
+RECOMMEND_STAR = " ★"
+RECOMMEND_COLOR = (255, 198, 64)
+RECOMMEND_TITLE_COLOR = (255, 214, 112)
+RECOMMEND_HEADER_HEIGHT = 38
+RECOMMEND_BAND_HEIGHT = 7
+
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 FONT_CJK = SKILL_ROOT / "scripts" / "SourceHanSansSC.otf"
 FONT_LATIN = FONT_CJK
 CACHE_DIR = SKILL_ROOT / "cover_cache"
 OUTPUT_DIR = SKILL_ROOT / "output"
+RECOMMEND_PATH = SKILL_ROOT / "data" / "recommend.json"
 
 
 def read_input(stream=None):
@@ -30,6 +38,40 @@ def read_input(stream=None):
     stream = stream or sys.stdin
     source = stream.buffer if hasattr(stream, "buffer") else stream
     return json.load(source)
+
+
+def load_recommend(path=RECOMMEND_PATH):
+    """读取推荐名单，返回名称集合（日文原名 / 中文名均可）。"""
+    path = Path(path)
+    if not path.exists():
+        return set()
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return set()
+    entries = data.get("entries") if isinstance(data, dict) else data
+    if isinstance(entries, dict):
+        return {str(key) for key in entries}
+    if isinstance(entries, list):
+        return {str(item) for item in entries}
+    return set()
+
+
+def is_recommended(anime, names=None):
+    """命中推荐名单：显式 recommended 字段，或标题（原名 / 中文名 / romaji）匹配。"""
+    if anime.get("recommended"):
+        return True
+    if not names:
+        return False
+    for key in ("title", "title_cn", "romaji"):
+        value = anime.get(key)
+        if value and value in names:
+            return True
+    return False
+
+
+def recommend_band_height(scale):
+    return max(5, round(RECOMMEND_BAND_HEIGHT * scale))
 
 
 def get_cover(url, cache_dir=CACHE_DIR):
@@ -91,14 +133,17 @@ def line_height(font, extra):
     return max(1, bbox[3] - bbox[1]) + extra
 
 
-def card_metrics(anime, width, fonts):
+def card_metrics(anime, width, fonts, recommended=False):
     title_font, body_font, meta_font = fonts
+    scale = max(0.7, min(1.0, width / 460))
     cover_width = min(140, max(80, round(width * COVER_RATIO)))
     text_width = max(40, width - cover_width - 24)
     original = anime.get("title") or anime.get("romaji") or ""
     title = anime.get("title_cn") or original or "???"
     if title == original:
         original = ""
+    if recommended:
+        title += RECOMMEND_STAR
     description = anime.get("description") or ""
     title_lines = wrap_text(title, title_font, text_width)
     original_lines = wrap_text(original, body_font, text_width) if original else []
@@ -108,31 +153,39 @@ def card_metrics(anime, width, fonts):
     meta_step = line_height(meta_font, 5)
     height = 8 + len(title_lines) * title_step + len(original_lines) * body_step
     height += meta_step + len(description_lines) * body_step + 8
+    if recommended:
+        height += RECOMMEND_HEADER_HEIGHT + recommend_band_height(scale)
     return cover_width, text_width, title_lines, original_lines, description_lines, max(MIN_CARD_H, height)
 
 
-def render_card(anime, width, cache_dir=CACHE_DIR):
+def render_card(anime, width, cache_dir=CACHE_DIR, recommend_names=None):
     """将一部番剧渲染成独立 Card 图片。"""
     scale = max(0.7, min(1.0, width / 460))
     fonts = load_fonts(scale)
     title_font, body_font, meta_font = fonts
-    cover_width, text_width, title_lines, original_lines, description_lines, height = card_metrics(anime, width, fonts)
+    recommended = is_recommended(anime, recommend_names)
+    cover_width, text_width, title_lines, original_lines, description_lines, height = card_metrics(anime, width, fonts, recommended)
     canvas = Image.new("RGB", (width, height), (24, 24, 32))
 
     cover = get_cover(anime.get("cover"), cache_dir)
+    content_top = RECOMMEND_HEADER_HEIGHT if recommended else 0
+    content_height = height - content_top - (recommend_band_height(scale) if recommended else 0)
     if cover:
-        canvas.paste(cover.resize((cover_width, height), Image.LANCZOS), (0, 0))
+        canvas.paste(cover.resize((cover_width, content_height), Image.LANCZOS), (0, content_top))
     else:
-        ImageDraw.Draw(canvas).rectangle((0, 0, cover_width - 1, height - 1), fill=(50, 50, 60))
+        ImageDraw.Draw(canvas).rectangle((0, content_top, cover_width - 1, content_top + content_height - 1), fill=(50, 50, 60))
 
     draw = ImageDraw.Draw(canvas)
+    if recommended:
+        draw.rectangle((0, 0, width, RECOMMEND_HEADER_HEIGHT), fill=RECOMMEND_COLOR)
+        draw.text((14, 7), "★  特别推荐", fill=(38, 29, 12), font=title_font)
     text_x = cover_width + 12
-    text_y = 8
+    text_y = content_top + 8
     title_step = line_height(title_font, 4)
     body_step = line_height(body_font, 3)
     meta_step = line_height(meta_font, 5)
     for line in title_lines:
-        draw.text((text_x, text_y), line, fill=(255, 255, 255), font=title_font)
+        draw.text((text_x, text_y), line, fill=RECOMMEND_TITLE_COLOR if recommended else (255, 255, 255), font=title_font)
         text_y += title_step
     for line in original_lines:
         draw.text((text_x, text_y), line, fill=(240, 240, 250), font=body_font)
@@ -145,6 +198,9 @@ def render_card(anime, width, cache_dir=CACHE_DIR):
     for line in description_lines:
         draw.text((text_x, text_y), line, fill=(255, 255, 255), font=body_font)
         text_y += body_step
+    if recommended:
+        band = recommend_band_height(scale)
+        draw.rectangle((0, height - band, width, height), fill=RECOMMEND_COLOR)
     return canvas
 
 
@@ -191,15 +247,17 @@ def main():
     parser.add_argument("--gap", type=int, default=DEFAULT_GAP)
     parser.add_argument("--output-dir", type=Path, default=OUTPUT_DIR)
     parser.add_argument("--cache-dir", type=Path, default=CACHE_DIR)
+    parser.add_argument("--recommend", type=Path, default=RECOMMEND_PATH, help="推荐名单 JSON（命中显示特别推荐横幅）")
     args = parser.parse_args()
     data = read_input()
     if not data:
         raise SystemExit(1)
+    recommend_names = load_recommend(args.recommend)
     card_width = (PAGE_WIDTH - args.gap * (args.cols - 1)) // args.cols
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     for page_number, page_data in enumerate(paginate(data, args.rows, args.cols), start=1):
-        cards = [render_card(item, card_width, args.cache_dir) for item in page_data]
+        cards = [render_card(item, card_width, args.cache_dir, recommend_names) for item in page_data]
         output = compose_grid(cards, args.rows, args.cols, args.gap)
         output_path = output_dir / f"anime_grid_{page_number}.jpg"
         output.save(str(output_path), "JPEG", quality=80)

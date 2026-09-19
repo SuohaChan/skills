@@ -1,86 +1,61 @@
 ---
 name: anime-schedule
-description: Query weekly anime episode release schedules. Use when user asks about anime airing times, new episodes, what's airing today/tomorrow, uses "新番", "动漫更新", "今天有什么番", "明天播什么", "这季新番", "anime schedule", "新番导视", "今日新番", "今日番剧", "追番清单".
+description: 查询动画播出日程并生成拼图卡片或单番介绍。用户询问播出时间、新集、今天/明天有什么番、季度导视或某部动画时使用，包括“新番”“动漫更新”“今日番剧”“追番清单”。
 ---
 
 # Anime Schedule
 
-## 1. 拉取数据
+## 日程卡片
 
-```bash
-cd /AstrBot/data/skills/anime-schedule && python3 scripts/fetch_anime.py today --json
-```
-参数：`today` / `tomorrow` / `yesterday` / `DD.MM.YYYY`；数据源配置在 `sources.json`，脚本按 `priority` 逐条尝试。默认 `--source auto`，也可用 `--source anilist`、`--source jikan`、`--source tsuzuki` 或 `--source bangumi` 指定数据源。Tsuzuki 提供按日期的集数和播出时间；Bangumi 提供番剧列表和星期信息，缺少集数或精确播出时间时统一输出 JSON `null`。
+以下命令从 `anime-schedule` 技能目录执行。
 
-脚本加 `--json` 时输出 JSON 数组；字段示例见 `references/fetch-anime-output.example.json`。
-失败或空结果会继续下一源，首个非空结果即返回；所有源失败时以非零状态退出。最终输出 `[]` 表示本次没有取得条目，不一定证明当天没有更新，请结合 stderr 的错误提示判断。
+1. 抓取指定日期：
 
-`schedule_kind=episode` 是按日期查询的集数记录；`weekly` 是常规周放送参考，不能确认当天实际更新或停播。AniList 和 Tsuzuki 返回 `episode`，Jikan 和 Bangumi 返回 `weekly`。周放送源仅支持近期日期。维护数据源、适配器及代理配置时参见 README 的“抓取模块”。
+   ```bash
+   python3 scripts/fetch_anime.py today --json
+   ```
 
-## 2. 翻译中文名
+   按需将 `today` 替换为 `tomorrow`、`yesterday` 或 `DD.MM.YYYY`。数据源按配置优先级依次尝试；失败或空结果会继续下一源，全部失败时命令以非零状态退出。`[]` 表示本次未取得条目，不足以证明当天没有播出。
 
-- 读状态缓存 `data/title-cache.json`
-- 保留 `title` 原名；优先使用源提供的 `title_cn`，缺失时在此步骤补译名
-- 缺失的根据你的知识翻译 → 写回缓存
-- 中文原名直接用
+2. 整理条目：
+   - 读取 `data/blacklist.json` 并过滤命中条目。
+   - 保留原名 `title`；优先采用源提供的 `title_cn`，否则查 `data/title-cache.json`，缺失时补译并写回。
+   - 查 `data/desc-cache.json`；缺失时补写 20–40 字简介，概括类型和看点。
+   - 未知集数或时间保留 JSON `null`，不要用总集数推测当日集数。
 
-## 3. 获取简介
+3. 合并同日同番的多集记录：
 
-- 读状态缓存 `data/desc-cache.json`
-- 缓存有则直接用，没有就根据你的知识编20-40字（类型+看点）
-- 编完写回缓存
-- JSON 里加 `description` 字段
+   ```bash
+   python3 scripts/merge-episodes.py < input.json > merged.json
+   ```
 
-## 4. 合并多集连播
+   后续使用 `merged.json`。
 
-用 `merge-episodes.py` 合并同日同番多集（EP1,EP2,EP3 → EP1~3）：
+4. 生成卡片：
 
-```bash
-echo '<JSON>' | python3 scripts/merge-episodes.py > merged.json
-```
+   ```bash
+   python3 scripts/make-grid.py --rows 4 --cols 2 --output-dir <output-directory> < merged.json
+   ```
 
-再读回 `merged.json` 继续后续步骤。
+   默认每页 4 行 2 列，最多 8 部；单部卡片用 `--rows 1 --cols 1`。脚本默认读取 `data/recommend.json` 并突出显示命中条目；也可在单次输入条目上设置 `recommended: true`。默认图片和封面缓存目录分别为 `output/`、`cover_cache/`。需要交给宿主应用发送时，将 `--output-dir` 指向宿主的图片目录。
 
-## 5. 生成拼图
+5. 每页发送一张图，并附日期和页码，例如：`📺 7月16日 周三 — 13部 (1/2)`。
 
-```bash
-cd /AstrBot/data/skills/anime-schedule && echo '<JSON>' | python3 scripts/make-grid.py --rows 4 --cols 2 --output-dir /AstrBot/data/temp
-```
-默认布局是 4 行 2 列，每页最多 8 部；可用 `--rows 2 --cols 4` 或 `--rows 3 --cols 3` 切换布局。每部番剧先渲染为独立 Card，再由布局器合成大图。默认图片输出到技能目录的 `output/`；上面的 `--output-dir` 示例将图片放到 AstrBot 临时目录。封面缓存默认在技能目录的 `cover_cache/`，也可用 `--cache-dir` 覆盖。
+`episode` 表示按日期查询到的集数记录；`weekly` 是常规周放送参考，不能确认当天实际更新或停播。AniList 和 Tsuzuki 返回 `episode`；Jikan 和 Bangumi 返回 `weekly`，且周放送源仅支持近期日期。维护数据源或适配器时参见 README 的“抓取模块”。
 
-## 6. 发送
+## 单部详情
 
-`send_message_to_user` 每页一张：
-```
-📺 7月16日 周三 — 13部 (1/2)
-{图}
-```
+用户问“XXX是什么番”“XXX介绍”或“XXX什么时候播”时：
 
-## 7. 管理缓存
+1. 先在指定日期的结果中查找；未找到时再按番名查询数据源，不能据此断定该番不存在。
+2. 按上文缓存规则准备译名和卡片简介；封面由 `make-grid.py` 使用缓存处理。
+3. 用 `--rows 1 --cols 1` 生成单卡，另写 80–150 字的详细介绍。
+4. 先发卡片图片，再发中文名、原名、已知的集数/时间和详细介绍。未知字段显示“未知”。
 
-- 清某部简介：删 `data/desc-cache.json` 中对应条目
-- 清所有简介：`data/desc-cache.json` 重置为 `{}`
-- 清某部译名：删 `data/title-cache.json` 中对应条目
+## 名单与缓存维护
 
-## 8. 黑名单
+- **推荐名单：** 编辑 `data/recommend.json`；名称按精确值匹配，源标题有不同写法时为同一部番补上各别名。格式示例见 `references/recommend.json.example`。
+- **黑名单：** 将原名加入 `data/blacklist.json` 以屏蔽；移除对应条目即可取消。
+- **译名或简介：** 从 `data/title-cache.json` 或 `data/desc-cache.json` 删除对应条目以便刷新；重置为 `{}` 可清空整个缓存。
 
-- 读 `data/blacklist.json`
-- 拉黑 → 加日文原名 → 写回
-- 取消 → 模糊匹配删 → 写回
-
-
-## 9. 单部详情
-
-用户问"XXX是什么番"/"XXX介绍"/"XXX什么时候播"时：
-
-1. 从 `python3 scripts/fetch_anime.py today --json` 找到目标（当天列表不保证包含所有番剧）
-2. 封面走缓存 `cover_cache/{md5}.jpg`
-3. 写一段详细介绍（80-150字）
-4. 用 `send_message_to_user` 发：**先图后文**
-
-```json
-{"messages": [
-  {"type": "image", "path": "{make-grid.py 输出的图片路径}"},
-  {"type": "plain", "text": "{中文名}\n{日文原名}\nEP{n} | ⏰ {HH:MM}\n\n{详细介绍}"}
-]}
-```
+输入输出字段示例见 `references/fetch-anime-output.example.json`。数据源优先级、适配器、代理配置和其他命令说明见 README。
