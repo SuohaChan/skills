@@ -9,10 +9,11 @@
 | [anime-schedule](./anime-schedule/) | 查询今日或指定日期的新番播出信息，并按卡片布局生成拼图 | Python 3.9+、`requests`、Pillow |
 | [desktop-screenshot](./desktop-screenshot/) | 截取当前桌面或所有显示器并保存为 PNG | Windows PowerShell、.NET |
 | [power-on-computer](./power-on-computer/) | 通过 Bemfa 向已配置的 ESP8266 发送一次开机指令 | Windows PowerShell、Bemfa 配置 |
+| [obsidian-rag](./obsidian-rag/) | 让 Agent 通过 Obsidian RAG MCP 检索个人笔记并基于引用回答 | MCP 客户端、obsidian-rag MCP |
 
 ## 安装
 
-克隆仓库后，将需要的技能目录放入 Agent 的技能目录：
+仓库目录是 Skill 的唯一事实来源。不要把 Skill 目录复制到 Agent 运行目录；应从运行目录创建指向仓库的 SymbolicLink，Windows 没有相应权限时使用 Junction。
 
 ```bash
 git clone https://github.com/SuohaChan/skills.git
@@ -20,11 +21,16 @@ git clone https://github.com/SuohaChan/skills.git
 
 例如只使用 `anime-schedule`：
 
-```text
-<skills-directory>/skills/anime-schedule/
+```powershell
+$source = "D:\project\skill\anime-schedule"
+$target = "C:\Users\yanme\.agents\skills\anime-schedule"
+New-Item -ItemType SymbolicLink -Path $target -Target $source
+# Windows 无 SymbolicLink 权限时使用：
+New-Item -ItemType Junction -Path $target -Target $source
+Get-Item $target | Format-List FullName,LinkType,Target
 ```
 
-每个技能的具体安装、依赖和使用方式，请阅读对应目录中的 `README.md`（如果有）和 `SKILL.md`。
+每个技能的具体安装、依赖和使用方式，请阅读对应目录中的 `README.md`（如果有）和 `SKILL.md`。完整安装规范见 [SKILL-DEVELOPMENT.md](./SKILL-DEVELOPMENT.md)。
 
 ## 目录约定
 
@@ -40,20 +46,29 @@ skills/
 ├── desktop-screenshot/
 │   ├── SKILL.md
 │   └── scripts/
-└── power-on-computer/
+├── power-on-computer/
+│   ├── SKILL.md
+│   ├── config.example.json
+│   ├── scripts/
+│   └── tests/
+└── obsidian-rag/
     ├── SKILL.md
-    ├── config.example.json
-    ├── scripts/
-    └── tests/
+    └── evals/
 ```
 
 技能运行产生的缓存、截图、输出图片和本机配置不应提交到仓库。各技能的 `.gitignore` 已排除这些内容；真实的 Bemfa UID 只能放在本地 `power-on-computer/config.json` 中。
 
 ## 开发与验证
 
-在仓库根目录执行：
+在仓库根目录执行统一检查：
 
-```bash
+```powershell
+python .\scripts\validate_all.py
+```
+
+技能自己的行为测试仍按目录说明执行，例如：
+
+```powershell
 python -m unittest discover -s anime-schedule/scripts -p "test_*.py" -v
 powershell -NoProfile -ExecutionPolicy Bypass -File .\power-on-computer\tests\verify.ps1
 ```
@@ -61,6 +76,8 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\power-on-computer\tests\ve
 修改技能后，应同时检查：
 
 - `SKILL.md` 的 YAML frontmatter 包含 `name` 和 `description`
+- `name` 与技能目录名一致，且没有重复的 Skill 名
+- 若存在 `evals/evals.json`，文件必须是合法 JSON
 - 脚本使用相对技能目录定位资源，不依赖个人电脑或服务器的绝对路径
 - 示例配置不包含真实 UID、密码、Token、私钥或服务器地址
 - 运行时数据、缓存和生成物不会进入 Git
