@@ -64,10 +64,10 @@ skills/
 
 ## 开发与验证
 
-在仓库根目录执行统一检查：
+在仓库根目录执行统一检查（根目录本身不是 Python 项目）：
 
 ```powershell
-uv run python .\scripts\validate_all.py
+uv run --no-project --python 3.13 python .\scripts\validate_all.py
 ```
 
 技能自己的行为测试仍按目录说明执行，例如：
