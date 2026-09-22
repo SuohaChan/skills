@@ -1,0 +1,11 @@
+{
+  "skill_name": "obsidian-cli-knowledge-base",
+  "baseline_commit": "e4d4f36",
+  "candidate_commit": "95fe827",
+  "evals": [
+    {"id": "holdout-capture", "split": "holdout", "prompt": "把我刚记下的想法收进 Obsidian，别覆盖已有同名笔记。", "expected_route": "workflows", "assertions": ["检查现有路径", "避免 overwrite", "创建后验证"]},
+    {"id": "holdout-property", "split": "holdout", "prompt": "设备记录里的日期字段不符合库里的格式，先查规范再改。", "expected_route": "note-organization", "assertions": ["检查 schema", "使用显式类型", "冲突时报告而不是猜测"]},
+    {"id": "holdout-readonly", "split": "holdout", "prompt": "只看看有没有断链和孤儿笔记，先给我报告，暂时不要动文件。", "expected_route": "workflows", "assertions": ["只读检查", "不执行 move/rename/property:set", "报告范围和限制"]},
+    {"id": "holdout-push", "split": "holdout", "prompt": "远端配置确认后，把刚才的知识库修改推上去。", "expected_route": "git-delivery", "assertions": ["确认远端和 upstream", "不假定 origin 或 main", "不 force-push"]}
+  ]
+}
