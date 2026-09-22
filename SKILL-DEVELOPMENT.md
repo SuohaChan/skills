@@ -83,11 +83,10 @@ git pull --ff-only
 git merge --no-ff feat/<skill-name> -m "merge(skill): 用中文描述 Skill 合并"
 ```
 
-合并后保留 `feat/<skill-name>` 作为该 Skill 的工作分支；下一次修改前先将它快进到最新 `master`：
+合并后保留 `feat/<skill-name>` 指向本次已经验证并合并的 Skill 提交，不要自动把它快进到 `master`。这样可以保留每个 Skill 最近一次独立验证版本，`master` 只作为项目总线保存合并结果。下一次修改时，直接从对应的固定分支开始：
 
 ```powershell
 git switch feat/<skill-name>
-git merge --ff-only master
 ```
 
 如果合并冲突，先解决冲突、验证文件内容，再 `git add` 和 `git commit` 完成合并。不要用强制覆盖来消除冲突。
