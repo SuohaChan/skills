@@ -22,23 +22,39 @@ D:\project\skill\
 
 Git 是 Skill 版本的唯一基线。旧版和新版通过 commit、branch 和 diff 管理，不复制完整的 `SKILL.md` 作为长期快照。OpenSpec 记录变更意图、规格、任务和归档；评测记录行为证据；三者职责不同但必须互相引用。
 
-一个 Skill 的修改必须从明确的旧版基线创建独立分支完成，不直接在 `master` 编写：
+每个真实 Skill 都有一个固定的功能分支，命名为 `feat/<skill-name>`。修改某个 Skill 时，只在它对应的分支工作；不要把单个 Skill 的修改直接写到 `master`。
+
+分支映射示例：
+
+```text
+anime-schedule              -> feat/anime-schedule
+desktop-screenshot          -> feat/desktop-screenshot
+obsidian-cli-knowledge-base -> feat/obsidian-cli-knowledge-base
+obsidian-rag                -> feat/obsidian-rag
+power-on-computer           -> feat/power-on-computer
+```
+
+进入已有 Skill 分支：
 
 ```powershell
 cd D:\project\skill
-git switch master
-git pull --ff-only
-git switch -c skill/<skill-name>-<change>
-# 记录本次工作的旧版基线，不复制 Skill 文件：
+git switch feat/<skill-name>
+# 记录本次工作的基线，不复制 Skill 文件：
 git rev-parse HEAD
 ```
 
-旧版基线是创建分支时的 `master` commit；新版是工作分支上的最新 commit。比较时使用 Git：
+第一次建立某个 Skill 分支时，从当时的 `master` 创建；后续继续修改该 Skill 时复用同一个 `feat/<skill-name>` 分支。旧版基线是本次修改开始前的分支 commit，新版是验证后的最新 commit。比较时使用 Git：
 
 ```powershell
 git diff <baseline-commit>...HEAD -- <skill-name>/SKILL.md
 git show <baseline-commit>:<skill-name>/SKILL.md
 ```
+
+分支范围必须清晰：
+
+- Skill 分支承载对应 Skill 目录及其专属的脚本、参考资料、评测和行为变更记录；
+- 整个 Skill 项目的规范、治理、仓库说明、根目录工具链和跨 Skill 管理直接在 `master` 修改；
+- 修改前用 `git diff --name-only` 检查范围，禁止用 `git add .` 把项目级文件混入 Skill 提交。
 
 如果评测工具需要不可变输入，可以在 OpenSpec 归档中保存评测元数据或 commit hash；只有工具明确不能读取 Git 时才保留文件快照。快照不是 Skill 的第二个事实来源，也不能被 Agent 当成主文件继续维护。
 
@@ -51,21 +67,27 @@ git show <baseline-commit>:<skill-name>/SKILL.md
 5. 为可验证的 Skill 写 `evals/evals.json`；
 6. 运行结构检查和针对性验证；
 7. 记录评测使用的旧版 commit、新版 commit、训练集、holdout 和已知限制；
-8. 提交该 Skill 的变更：
+8. 在对应 `feat/<skill-name>` 分支提交该 Skill 的变更：
 
 ```powershell
-git add <skill-name> SKILL-DEVELOPMENT.md
+git add <skill-name>
 git add openspec/changes/<change-name> .agents/skills/<generated-openspec-skills-if-added>
-git commit -m "feat(<skill-name>): add skill"
+git commit -m "feat(skill): 用中文描述 Skill 修改"
 ```
 
-再合并回 `master`：
+验证通过后合并回 `master`：
 
 ```powershell
 git switch master
 git pull --ff-only
-git merge --no-ff skill/<skill-name>-<change> -m "merge(<skill-name>): <change>"
-git branch -d skill/<skill-name>-<change>
+git merge --no-ff feat/<skill-name> -m "merge(skill): 用中文描述 Skill 合并"
+```
+
+合并后保留 `feat/<skill-name>` 作为该 Skill 的工作分支；下一次修改前先将它快进到最新 `master`：
+
+```powershell
+git switch feat/<skill-name>
+git merge --ff-only master
 ```
 
 如果合并冲突，先解决冲突、验证文件内容，再 `git add` 和 `git commit` 完成合并。不要用强制覆盖来消除冲突。
@@ -122,7 +144,7 @@ Skill 使用渐进式披露：
 
 ```powershell
 $env:PYTHONUTF8 = "1"
-python C:\Users\yanme\.codex\skills\skill-creator\scripts\quick_validate.py D:\project\skill\<skill-name>
+uv run python C:\Users\yanme\.codex\skills\skill-creator\scripts\quick_validate.py D:\project\skill\<skill-name>
 ```
 
 对有明确输出的 Skill，再运行 `evals/evals.json` 中的测试。验证触发、工具调用顺序、输出格式和失败处理，不只检查 Markdown 能否读取。

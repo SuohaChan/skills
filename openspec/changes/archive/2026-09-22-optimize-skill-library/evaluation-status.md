@@ -1,5 +1,11 @@
 # 评测状态
 
+## 版本追踪
+
+- `baseline_commit`: `114958d`（`obsidian-rag` 旧版）
+- `candidate_commit`: `9b4e72c`（`obsidian-rag` 新版）
+- `merge_commit`: `d2e1166`（合并到 `master`）
+
 ## 已完成
 
 - 已保存变更前的 `obsidian-rag` 快照：`baseline/obsidian-rag.SNAPSHOT.md`。

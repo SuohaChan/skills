@@ -67,13 +67,13 @@ skills/
 在仓库根目录执行统一检查：
 
 ```powershell
-python .\scripts\validate_all.py
+uv run python .\scripts\validate_all.py
 ```
 
 技能自己的行为测试仍按目录说明执行，例如：
 
 ```powershell
-python -m unittest discover -s anime-schedule/scripts -p "test_*.py" -v
+uv run --directory anime-schedule python -m unittest discover -s scripts -p "test_*.py" -v
 powershell -NoProfile -ExecutionPolicy Bypass -File .\power-on-computer\tests\verify.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\obsidian-cli-knowledge-base\tests\verify.ps1
 ```

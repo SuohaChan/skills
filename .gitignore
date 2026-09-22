@@ -3,6 +3,10 @@ screenshots/
 desktop-screenshot/screenshots/
 power-on-computer/config.json
 
+# Python build and test caches
+**/__pycache__/
+*.py[cod]
+
 # Local evaluation and temporary artifacts
 *-workspace/
 evals/*/outputs/
