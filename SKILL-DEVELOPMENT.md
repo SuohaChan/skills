@@ -18,16 +18,29 @@ D:\project\skill\
 
 每个 Skill 使用一个独立目录，目录名使用小写短横线命名；`SKILL.md` 必须位于该目录根部。只有确实需要时才创建 `evals`、`references`、`scripts` 或 `assets`。
 
-## 分支和合并流程
+## 版本基线、分支和合并流程
 
-一个 Skill 的修改必须在自己的分支完成，不直接在 `master` 编写：
+Git 是 Skill 版本的唯一基线。旧版和新版通过 commit、branch 和 diff 管理，不复制完整的 `SKILL.md` 作为长期快照。OpenSpec 记录变更意图、规格、任务和归档；评测记录行为证据；三者职责不同但必须互相引用。
+
+一个 Skill 的修改必须从明确的旧版基线创建独立分支完成，不直接在 `master` 编写：
 
 ```powershell
 cd D:\project\skill
 git switch master
 git pull --ff-only
-git switch -c feat/<skill-name>
+git switch -c skill/<skill-name>-<change>
+# 记录本次工作的旧版基线，不复制 Skill 文件：
+git rev-parse HEAD
 ```
+
+旧版基线是创建分支时的 `master` commit；新版是工作分支上的最新 commit。比较时使用 Git：
+
+```powershell
+git diff <baseline-commit>...HEAD -- <skill-name>/SKILL.md
+git show <baseline-commit>:<skill-name>/SKILL.md
+```
+
+如果评测工具需要不可变输入，可以在 OpenSpec 归档中保存评测元数据或 commit hash；只有工具明确不能读取 Git 时才保留文件快照。快照不是 Skill 的第二个事实来源，也不能被 Agent 当成主文件继续维护。
 
 完成后按顺序检查：
 
@@ -37,10 +50,12 @@ git switch -c feat/<skill-name>
 4. 具体分支资料放在 `references/`，重复或机械操作放在 `scripts/`；
 5. 为可验证的 Skill 写 `evals/evals.json`；
 6. 运行结构检查和针对性验证；
-7. 提交该 Skill 的变更：
+7. 记录评测使用的旧版 commit、新版 commit、训练集、holdout 和已知限制；
+8. 提交该 Skill 的变更：
 
 ```powershell
 git add <skill-name> SKILL-DEVELOPMENT.md
+git add openspec/changes/<change-name> .agents/skills/<generated-openspec-skills-if-added>
 git commit -m "feat(<skill-name>): add skill"
 ```
 
@@ -48,11 +63,41 @@ git commit -m "feat(<skill-name>): add skill"
 
 ```powershell
 git switch master
-git merge --no-ff feat/<skill-name> -m "merge(<skill-name>): add skill"
-git branch -d feat/<skill-name>
+git pull --ff-only
+git merge --no-ff skill/<skill-name>-<change> -m "merge(<skill-name>): <change>"
+git branch -d skill/<skill-name>-<change>
 ```
 
 如果合并冲突，先解决冲突、验证文件内容，再 `git add` 和 `git commit` 完成合并。不要用强制覆盖来消除冲突。
+
+`master` 只接受已经完成验证的合并结果。若需要继续修改，基于最新 `master` 创建新的变更分支，不在已经合并的 commit 上直接改写历史。
+
+## OpenSpec、Git 和评测的职责
+
+一次 Skill 变更的推荐关系是：
+
+```text
+Git baseline commit
+  -> OpenSpec proposal / spec / design / tasks
+  -> feature branch implementation
+  -> old-vs-new + holdout evaluation
+  -> validated merge commit on master
+  -> OpenSpec archive
+```
+
+- **Git**：保存版本、分支、差异和可恢复的旧版；旧版优先从 commit 读取。
+- **OpenSpec**：保存为什么改、改什么、如何改、任务是否完成，以及归档后的长期规格。
+- **评测**：证明新版相对于旧版是否改善，必须记录输入集合、版本 commit、结果和限制。
+
+评测报告至少记录：
+
+- `baseline_commit`：旧版 commit；
+- `candidate_commit`：新版 commit；
+- 使用的训练集、负例、holdout 和回归集；
+- 触发、工具顺序、输出质量、安全边界等实际指标；
+- 无法执行的部分和待人工验证内容。
+
+不要只保存“新版结果很好”这类结论；未来 Agent 必须能从 commit 和评测文件重新定位新旧版本。
 
 ## Skill 内容设计
 
