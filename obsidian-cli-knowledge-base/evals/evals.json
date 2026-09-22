@@ -1,0 +1,15 @@
+{
+  "skill_name": "obsidian-cli-knowledge-base",
+  "baseline_commit": "e4d4f36",
+  "candidate_commit": "pending",
+  "evals": [
+    {"id": "train-create", "split": "train", "prompt": "把这条学习记录整理成一篇新笔记，放到知识库合适的位置。", "expected_route": "workflows", "assertions": ["读取 Vault 规则和模板", "检查目标路径冲突", "创建后重新读取并验证"]},
+    {"id": "train-archive", "split": "train", "prompt": "这篇笔记已经过时了，帮我归档。", "expected_route": "workflows", "assertions": ["先检查内容和归档位置", "发现冲突时停止", "移动后验证源和目标"]},
+    {"id": "train-review", "split": "train", "prompt": "只审查知识库里的任务、未解析链接和孤立笔记，不要修改任何内容。", "expected_route": "workflows", "assertions": ["只使用只读命令", "读取 Vault 私密路径规则", "不执行写入命令"]},
+    {"id": "train-organize", "split": "train", "prompt": "帮我判断这篇设备笔记应该放在哪个文件夹，并保持现有知识库的组织方式。", "expected_route": "note-organization", "assertions": ["读取现有组织规则", "不强行套用固定框架", "必要时使用 obsidian move 并验证链接"]},
+    {"id": "train-property", "split": "train", "prompt": "给这篇笔记补上一个已有的状态属性，类型和值要符合知识库规范。", "expected_route": "note-organization", "assertions": ["先检查 schema 和属性统计", "验证类型和值", "写入后读回属性"]},
+    {"id": "train-search", "split": "train", "prompt": "在我的 Obsidian 知识库里搜索关于向量数据库的笔记。", "expected_route": "core-only", "assertions": ["确认目标 Vault", "使用 CLI 搜索", "不进入写入或 Git 流程"]},
+    {"id": "train-commit", "split": "train", "prompt": "我确认笔记修改无误了，现在提交到这个 Vault 的 Git 仓库。", "expected_route": "git-delivery", "assertions": ["检查仓库和已有改动", "只暂存当前任务路径", "提交前验证并报告结果"]},
+    {"id": "train-push", "split": "train", "prompt": "刚才的笔记改动已经提交，请推送到远端。", "expected_route": "git-delivery", "assertions": ["确认用户明确授权推送", "解析实际 upstream", "推送后核对状态"]}
+  ]
+}
