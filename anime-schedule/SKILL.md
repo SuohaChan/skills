@@ -1,9 +1,14 @@
 ---
 name: anime-schedule
 description: 查询动画播出日程并生成拼图卡片或单番介绍。用户询问播出时间、新集、今天/明天有什么番、季度导视或某部动画时使用，包括“新番”“动漫更新”“今日番剧”“追番清单”。
+compatibility: 需要 Python 3.13+ 和项目依赖；优先使用 uv 运行项目脚本。
 ---
 
 # Anime Schedule
+
+## 运行环境
+
+从 `anime-schedule` 技能目录执行脚本。项目使用 `pyproject.toml` 和 `uv.lock` 管理依赖；优先使用 `uv run python`，确保脚本使用项目对应的 Python 和依赖环境。不要直接调用宿主机的 `python` 或 `python3`，因为它们可能指向不同版本或缺少依赖。
 
 ## 日程卡片
 
@@ -12,7 +17,7 @@ description: 查询动画播出日程并生成拼图卡片或单番介绍。用�
 1. 抓取指定日期：
 
    ```bash
-   python3 scripts/fetch_anime.py today --json
+   uv run python scripts/fetch_anime.py today --json
    ```
 
    按需将 `today` 替换为 `tomorrow`、`yesterday` 或 `DD.MM.YYYY`。数据源按配置优先级依次尝试；失败或空结果会继续下一源，全部失败时命令以非零状态退出。`[]` 表示本次未取得条目，不足以证明当天没有播出。
@@ -26,7 +31,7 @@ description: 查询动画播出日程并生成拼图卡片或单番介绍。用�
 3. 合并同日同番的多集记录：
 
    ```bash
-   python3 scripts/merge-episodes.py < input.json > merged.json
+   uv run python scripts/merge-episodes.py < input.json > merged.json
    ```
 
    后续使用 `merged.json`。
@@ -34,7 +39,7 @@ description: 查询动画播出日程并生成拼图卡片或单番介绍。用�
 4. 生成卡片：
 
    ```bash
-   python3 scripts/make-grid.py --rows 4 --cols 2 --output-dir <output-directory> < merged.json
+   uv run python scripts/make-grid.py --rows 4 --cols 2 --output-dir <output-directory> < merged.json
    ```
 
    默认每页 4 行 2 列，最多 8 部；单部卡片用 `--rows 1 --cols 1`。脚本默认读取 `data/recommend.json` 并突出显示命中条目；也可在单次输入条目上设置 `recommended: true`。默认图片和封面缓存目录分别为 `output/`、`cover_cache/`。需要交给宿主应用发送时，将 `--output-dir` 指向宿主的图片目录。

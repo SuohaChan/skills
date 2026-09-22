@@ -11,9 +11,39 @@ git clone https://github.com/SuohaChan/skills.git <skills-directory>/skills
 
 ## 依赖
 
-- Python 3.9+ 和 `requests`（执行 `pip install -r requirements.txt`）
+- Python 3.13+
+- 推荐安装 [uv](https://docs.astral.sh/uv/)，项目依赖由 `pyproject.toml` 和 `uv.lock` 管理
 - Pillow 10+（拼图渲染，已包含在 `requirements.txt`）
 - 至少能访问 `sources.json` 中一个已启用的数据源
+
+### 使用 uv（推荐）
+
+在技能目录执行：
+
+```bash
+uv sync
+uv run python scripts/fetch_anime.py today --json
+```
+
+### 不使用 uv
+
+也可以使用 Python 标准虚拟环境和 pip。先在技能目录创建并激活 `.venv`，再安装依赖：
+
+Windows：
+
+```powershell
+py -m venv .venv
+.venv\Scripts\python -m pip install -r requirements.txt
+.venv\Scripts\python scripts\fetch_anime.py today --json
+```
+
+Linux/macOS：
+
+```bash
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python scripts/fetch_anime.py today --json
+```
 
 ## 用法
 
@@ -63,7 +93,7 @@ skill 会自动：
 如果你要把这个 skill 给另一个 agent（如 QQ 机器人），只需：
 
 1. 把整个目录克隆过去
-2. 让 agent 先跑 `python3 scripts/fetch_anime.py today --json` 拿原始数据
+2. 让 agent 在技能目录执行 `uv run python scripts/fetch_anime.py today --json` 拿原始数据；若宿主没有 uv，先按上面的 pip/venv 方式准备环境
 3. 再自己处理翻译 + 过滤逻辑，或者直接用 SKILL.md 里的完整工作流
 
 `--json` 的 stdout 是 JSON 数组；诊断信息写入 stderr，方便下游解析。
@@ -73,9 +103,9 @@ skill 会自动：
 ## 抓取模块
 
 ```bash
-python scripts/fetch_anime.py today --json
-python scripts/fetch_anime.py today --source bangumi --json
-python -B -m unittest discover -s scripts -p 'test_*.py' -v
+uv run python scripts/fetch_anime.py today --json
+uv run python scripts/fetch_anime.py today --source bangumi --json
+uv run python -B -m unittest discover -s scripts -p 'test_*.py' -v
 ```
 
 `fetch_anime.py` 负责配置校验、北京时间日期、命令行和顺序回退；`adapters.py` 用 `ADAPTERS[name]` 选择函数，把各源响应转换成统一 JSON。无需额外的策略类或重复的 `adapter` 配置字段。
