@@ -1,0 +1,8 @@
+[project]
+name = "anime-schedule"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "pillow>=10,<12",
+    "requests>=2.31,<3",
+]
