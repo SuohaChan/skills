@@ -1,0 +1,4 @@
+interface:
+  display_name: "Obsidian CLI Knowledge Base"
+  short_description: "CLI-first Obsidian vault management"
+  default_prompt: "Use $obsidian-cli-knowledge-base to manage my Obsidian vault with the official CLI."

@@ -10,6 +10,7 @@
 | [desktop-screenshot](./desktop-screenshot/) | 截取当前桌面或所有显示器并保存为 PNG | Windows PowerShell、.NET |
 | [power-on-computer](./power-on-computer/) | 通过 Bemfa 向已配置的 ESP8266 发送一次开机指令 | Windows PowerShell、Bemfa 配置 |
 | [obsidian-rag](./obsidian-rag/) | 让 Agent 通过 Obsidian RAG MCP 检索个人笔记并基于引用回答 | MCP 客户端、obsidian-rag MCP |
+| [obsidian-cli-knowledge-base](./obsidian-cli-knowledge-base/) | 使用官方 Obsidian CLI 管理知识库，并遵循目标 vault 自己的规范 | Obsidian Desktop、官方 CLI |
 
 ## 安装
 
@@ -51,9 +52,12 @@ skills/
 │   ├── config.example.json
 │   ├── scripts/
 │   └── tests/
-└── obsidian-rag/
+├── obsidian-rag/
     ├── SKILL.md
     └── evals/
+└── obsidian-cli-knowledge-base/
+    ├── SKILL.md
+    └── agents/openai.yaml
 ```
 
 技能运行产生的缓存、截图、输出图片和本机配置不应提交到仓库。各技能的 `.gitignore` 已排除这些内容；真实的 Bemfa UID 只能放在本地 `power-on-computer/config.json` 中。
@@ -71,6 +75,7 @@ python .\scripts\validate_all.py
 ```powershell
 python -m unittest discover -s anime-schedule/scripts -p "test_*.py" -v
 powershell -NoProfile -ExecutionPolicy Bypass -File .\power-on-computer\tests\verify.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\obsidian-cli-knowledge-base\tests\verify.ps1
 ```
 
 修改技能后，应同时检查：
