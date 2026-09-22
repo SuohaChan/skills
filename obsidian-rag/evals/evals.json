@@ -1,0 +1,20 @@
+{
+  "skill_name": "obsidian-rag",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我们现在的 RAG 为什么把 Chroma 放在项目 data 目录？",
+      "expected_output": "调用 search_notes，必要时 read_note，依据项目笔记回答并给出引用。"
+    },
+    {
+      "id": 2,
+      "prompt": "我之前记录的 PKCE 为什么要用 code_verifier？",
+      "expected_output": "先搜索本地 PKCE 笔记，必要时读取原文，再根据笔记引用回答。"
+    },
+    {
+      "id": 3,
+      "prompt": "什么是 BM25？",
+      "expected_output": "普通概念问题不强制调用本地 RAG，直接给出一般解释。"
+    }
+  ]
+}
