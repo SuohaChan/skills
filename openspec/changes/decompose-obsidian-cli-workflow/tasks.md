@@ -21,6 +21,6 @@
 
 ## Delivery
 
-- [ ] 4.1 在 `feat/obsidian-cli-knowledge-base` 提交 Skill、OpenSpec 和核验资产
+- [x] 4.1 在 `feat/obsidian-cli-knowledge-base` 提交 Skill、OpenSpec 和核验资产
 - [ ] 4.2 将该分支以 `--no-ff` 合并到 `master`，保留 Skill 分支停留在新版 Skill 提交
 - [ ] 4.3 推送 `master` 和对应 Skill 分支，并核对远端提交

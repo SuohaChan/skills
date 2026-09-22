@@ -1,7 +1,7 @@
 {
   "skill_name": "obsidian-cli-knowledge-base",
   "baseline_commit": "e4d4f36",
-  "candidate_commit": "pending",
+  "candidate_commit": "95fe827",
   "evals": [
     {"id": "train-create", "split": "train", "prompt": "把这条学习记录整理成一篇新笔记，放到知识库合适的位置。", "expected_route": "workflows", "assertions": ["读取 Vault 规则和模板", "检查目标路径冲突", "创建后重新读取并验证"]},
     {"id": "train-archive", "split": "train", "prompt": "这篇笔记已经过时了，帮我归档。", "expected_route": "workflows", "assertions": ["先检查内容和归档位置", "发现冲突时停止", "移动后验证源和目标"]},

@@ -3,7 +3,7 @@
 ## Baseline and candidate
 
 - `baseline_commit`: `e4d4f36`（修改前 `feat/obsidian-cli-knowledge-base` 分支提交）
-- `candidate_commit`: 待提交
+- `candidate_commit`: `95fe827`（候选 Skill 提交）
 - 评测资产：8 个 `train`，4 个 `holdout`
 
 ## 核验方法
@@ -28,4 +28,4 @@
 
 - 当前仓库没有独立的多代理行为评测运行器，因此没有声称旧版和新版的真实 Agent 完成率、工具顺序或 token 成本变化。
 - 没有启动 Obsidian，也没有执行真实 Vault 写入、移动、重命名、提交或推送。
-- 合并到 `master` 后应将候选提交哈希补回本文件和两个 eval JSON 的 `candidate_commit` 字段。
+- 本次结果是策略/结构核验，不替代真实 Agent 行为对照；后续若接入行为评测运行器，应在同一 train/holdout 集上补充工具顺序、完成度和成本结果。
