@@ -1,20 +1,62 @@
 {
   "skill_name": "obsidian-rag",
+  "description": "Training and regression cases for trigger selection, retrieval behavior, evidence handling, and citation discipline.",
   "evals": [
     {
-      "id": 1,
+      "id": "train-personal-decision",
+      "split": "train",
+      "expected_trigger": true,
       "prompt": "我们现在的 RAG 为什么把 Chroma 放在项目 data 目录？",
       "expected_output": "调用 search_notes，必要时 read_note，依据项目笔记回答并给出引用。"
     },
     {
-      "id": 2,
+      "id": "train-history-explanation",
+      "split": "train",
+      "expected_trigger": true,
       "prompt": "我之前记录的 PKCE 为什么要用 code_verifier？",
       "expected_output": "先搜索本地 PKCE 笔记，必要时读取原文，再根据笔记引用回答。"
     },
     {
-      "id": 3,
+      "id": "train-project-implementation",
+      "split": "train",
+      "expected_trigger": true,
+      "prompt": "根据我项目里的记录，解释现在的 RAG 检索流程和它的限制。",
+      "expected_output": "检索相关项目笔记，必要时读取完整来源，区分笔记事实与推断并附引用。"
+    },
+    {
+      "id": "train-local-source-request",
+      "split": "train",
+      "expected_trigger": true,
+      "prompt": "请查一下本地 Markdown 里有没有关于 Chroma 选型的记录。",
+      "expected_output": "使用本地检索工具查找 Markdown 来源，并报告结果和引用。"
+    },
+    {
+      "id": "train-generic-concept",
+      "split": "train",
+      "expected_trigger": false,
       "prompt": "什么是 BM25？",
-      "expected_output": "普通概念问题不强制调用本地 RAG，直接给出一般解释。"
+      "expected_output": "不强制调用本地 RAG，直接给出一般解释。"
+    },
+    {
+      "id": "train-provided-text",
+      "split": "train",
+      "expected_trigger": false,
+      "prompt": "请解释我下面贴出的这段文字，不需要查我的笔记：BM25 是一种词法检索方法。",
+      "expected_output": "基于当前消息提供的文本回答，不调用本地 RAG。"
+    },
+    {
+      "id": "train-no-result",
+      "split": "train",
+      "expected_trigger": true,
+      "prompt": "搜索我的笔记，看看我以前是否记录过某个完全不存在的虚构项目。",
+      "expected_output": "搜索无结果时明确说明本地知识不足，不编造笔记内容或引用。"
+    },
+    {
+      "id": "train-conflicting-notes",
+      "split": "train",
+      "expected_trigger": true,
+      "prompt": "我笔记里对向量数据库有不同结论，请找出冲突并告诉我哪条更可信。",
+      "expected_output": "检索多个来源，必要时读取原文，展示冲突并依据时间或具体性说明判断。"
     }
   ]
 }

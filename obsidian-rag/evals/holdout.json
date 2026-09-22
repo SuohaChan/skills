@@ -1,0 +1,30 @@
+{
+  "skill_name": "obsidian-rag",
+  "description": "Do not use these cases to design or tune the Skill. Run only after a candidate revision is complete.",
+  "evals": [
+    {
+      "id": "holdout-paraphrased-decision",
+      "expected_trigger": true,
+      "prompt": "从我以前的项目记录里找一下，当初为什么把向量库数据放到 data 目录。",
+      "expected_output": "识别为依赖个人项目历史的问题，先检索本地笔记并依据来源回答。"
+    },
+    {
+      "id": "holdout-paraphrased-general",
+      "expected_trigger": false,
+      "prompt": "用通俗的话介绍一下 BM25 的工作原理，和我的笔记无关。",
+      "expected_output": "不调用本地 RAG，直接进行一般知识解释。"
+    },
+    {
+      "id": "holdout-citation-boundary",
+      "expected_trigger": true,
+      "prompt": "搜索本地记录后，只告诉我能被原文直接支持的结论；不能确认的地方标出来。",
+      "expected_output": "检索并引用原文，明确区分直接证据和无法确认的推断。"
+    },
+    {
+      "id": "holdout-missing-context",
+      "expected_trigger": true,
+      "prompt": "我记得之前讨论过一个认证方案，但现在想不起具体内容了，帮我从历史记录找出来。",
+      "expected_output": "检索相关历史记录，搜索摘要不足时读取原文；无结果时明确说明不足。"
+    }
+  ]
+}
